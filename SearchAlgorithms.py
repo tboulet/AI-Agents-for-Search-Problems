@@ -5,12 +5,11 @@ Properties:
 Completness : whether a solution is found (if one exists)
 Optimality : whether an optimal solution is found (if a solution exists)
 Space complexity : in terms of states kept in memory. b is the branching factor, m the depth of a solution, M is the maximum depth.
-Time complexity
+Time complexity : in terms of number of basic operations.
 """
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import Callable, Union
 from random import random
-import queue
 import heapq
 
 from SearchProblem import Node, OrderedNode, State, SearchProblem, NonDeterministicSearchProblem
@@ -174,7 +173,7 @@ class UCS(SearchAlgorithm):
 class A_star(SearchAlgorithm):
     """A* algorithm.
     Complete, optimal if admissible heuristic"""
-    def __init__(self, heuristic = lambda state : 0):
+    def __init__(self, heuristic : Callable[[State], float] = lambda state : 0) -> None:
         super().__init__()
         self.heuristic = heuristic
         
@@ -205,12 +204,6 @@ class A_star(SearchAlgorithm):
             self.explored[child_state] = child_node
             
             
-
-
-
-
-
-
 
 
 class NonDeterministicSearchProblemAlgorithm:
