@@ -1,4 +1,4 @@
-# IA-Agents-for-Search-Problems
+# AI-Agents-for-Search-Problems
 An implementation in python of some algorithms for search problems such as A*, that can be applied to any problem object that follow the SearchProblem interface.
 
 The main feature is to define relatively quickly your concrete search problem as a subclass of the interface SearchProblem in order to solve it using already implemented algos. Some of those algos including BFS, DFS, Uniform Cost Search (Dijkstra ) and A* are already implemented. 
