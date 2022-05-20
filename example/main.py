@@ -1,6 +1,7 @@
-from search_problems.FindCandy import FindCandyProblem
-from SearchAlgorithms import DFS, BFS, UCS, A_star
-from utils import manhattan_distance
+from SearchProblemsAI.search_problems.FindCandy import FindCandyProblem
+from SearchProblemsAI.SearchAlgorithms import NonDeterministicSearchProblemAlgorithm
+from SearchProblemsAI.SearchAlgorithms import DFS, BFS, UCS, A_star
+from SearchProblemsAI.utils import manhattan_distance
 
 #Define problem
 problem = FindCandyProblem(side_lenght=10)
