@@ -96,20 +96,29 @@ class NonDeterministicFindCandyProblem(FindCandyProblem, NonDeterministicSearchP
     
     def get_transition(self, state, action) -> list[FindCandyState]:
         x, y = state.pos
+        childs = list()
         if action == 'left':
             x -= 1
-            if x > 0 and self.map[y][x-1] and random.random() < 0.5: x-= 1
+            if x > 0 and self.map[y][x-1]: 
+                child_state = FindCandyState(self.map, (x-1, y), self.goal_pos)
+                childs.append(child_state)
         elif action == 'right':
             x += 1
-            if x < self.side_lenght - 1 and self.map[y][x+1] and random.random() < 0.5: x+= 1
+            if x < self.side_lenght - 1 and self.map[y][x+1]: 
+                child_state = FindCandyState(self.map, (x+1, y), self.goal_pos)
+                childs.append(child_state)
         elif action == 'up':
             y -= 1
-            if y > 0 and self.map[y-1][x] and random.random() < 0.5: y-= 1
+            if y > 0 and self.map[y-1][x]: 
+                child_state = FindCandyState(self.map, (x, y-1), self.goal_pos)
+                childs.append(child_state)
         elif action == 'down':
             y += 1
-            if y < self.side_lenght - 1 and self.map[y+1][x] and random.random() < 0.5: y+= 1
+            if y < self.side_lenght - 1 and self.map[y+1][x]: 
+                child_state = FindCandyState(self.map, (x, y+1), self.goal_pos)
+                childs.append(child_state)
         child_state = FindCandyState(self.map, (x, y), self.goal_pos)
-        return [child_state]
+        return childs + [child_state]
 
 
 
