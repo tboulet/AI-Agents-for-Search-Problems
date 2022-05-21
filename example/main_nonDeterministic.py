@@ -1,3 +1,4 @@
+import context
 from SearchProblemsAI.search_problems.FindCandy import NonDeterministicFindCandyProblem
 from SearchProblemsAI.SearchAlgorithms import NonDeterministicSearchProblemAlgorithm
 
@@ -13,4 +14,5 @@ plan = algo.solve(problem = problem)
 
 #Test the solution
 print("\nTesting solution :")
+print(plan)
 problem.apply_solution(plan)

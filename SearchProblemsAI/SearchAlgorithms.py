@@ -12,7 +12,7 @@ from typing import Callable, Union
 from random import random
 import heapq
 
-from SearchProblem import Node, OrderedNode, State, SearchProblem, NonDeterministicSearchProblem
+from SearchProblemsAI.SearchProblem import Node, OrderedNode, State, SearchProblem, NonDeterministicSearchProblem
 
 
 class SearchAlgorithm(ABC):

@@ -1,3 +1,4 @@
+import context
 from SearchProblemsAI.search_problems.FindCandy import FindCandyProblem
 from SearchProblemsAI.SearchAlgorithms import NonDeterministicSearchProblemAlgorithm
 from SearchProblemsAI.SearchAlgorithms import DFS, BFS, UCS, A_star

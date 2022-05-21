@@ -6,7 +6,7 @@ A non deterministic version is also implemented, where an action to a certain di
 A sensorless version is also implemented, where the goal is now to find a sequence of actions that would lead every possible initial state to a goal state (and not only 1 starting state).
 """
 import random
-from SearchProblem import SearchProblem, State, NonDeterministicSearchProblem, SensorlessSearchProblem, SensorlessSearchProblem_v2
+from SearchProblemsAI.SearchProblem import SearchProblem, State, NonDeterministicSearchProblem, SensorlessSearchProblem, SensorlessSearchProblem_v2
 
 class FindCandyState(State):
     def __init__(self, map, pos, goal_pos):
@@ -116,8 +116,8 @@ class NonDeterministicFindCandyProblem(FindCandyProblem, NonDeterministicSearchP
 class SensorlessFindCandyProblem(SensorlessSearchProblem_v2):
     """The sensorless version of the FindCandy problem. 
     Goal is to find a sequence of actions that would lead every possible initial state to a goal state (and not only 1 starting state)."""
-    def __init__(self) -> None:
-        physical_problem = FindCandyProblem()
+    def __init__(self, side_lenght = 10, wall_ratio = 0.3) -> None:
+        physical_problem = FindCandyProblem(side_lenght = side_lenght, wall_ratio = wall_ratio)
         initial_belief_state = set()
         for y in range(physical_problem.side_lenght):
             for x in range(physical_problem.side_lenght):
