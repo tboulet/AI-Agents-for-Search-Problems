@@ -8,9 +8,12 @@ from typing import Union
 #   Belief State, which is a set of state the agent believe it could be in
 #   Percept, which is a percept of a state
 
+class Action: pass
+class Plan: pass
+
 class Node:
     """The Node class for the SEARCH problem. A node is simply defined as a state, a parent node, and an action taken to reach this state."""
-    def __init__(self, state : object, parent : object, action : object) -> None:
+    def __init__(self, state : "State", parent : "Node", action : Action) -> None:
         self.state = state
         self.parent = parent
         self.action = action    
@@ -18,10 +21,10 @@ class Node:
 class OrderedNode(Node):
       """Some algorithms requiring to keep the cost in memory and to be able to compare node.
       Such node are 'lower' if their cost is 'lower'."""
-      def __init__(self, state: object, parent: object, action: object, cost : float) -> None:
+      def __init__(self, state: "State", parent: "OrderedNode", action: Action, cost : float) -> None:
             super().__init__(state, parent, action)
             self.cost = cost
-      def __lt__(self, other : Node) -> bool:
+      def __lt__(self, other : "OrderedNode") -> bool:
             return self.cost < other.cost
           
 class State(ABC):
@@ -33,7 +36,7 @@ class State(ABC):
           pass
         
       @abstractmethod
-      def __eq__(self, __o: object) -> bool:
+      def __eq__(self, __o: "State") -> bool:
           pass
       
 class BeliefState(State):
@@ -84,7 +87,7 @@ class SearchProblem(ABC):
         """
         
     @abstractmethod
-    def get_actions(self, state) -> list[object]:
+    def get_actions(self, state) -> list[Action]:
         """Returns a list of actions that can be executed in the given state.
           state: Search state
         """
@@ -96,7 +99,7 @@ class SearchProblem(ABC):
           action: Action to be executed
         """
         
-    def apply_solution(self, list_of_actions : list[object]) -> None:
+    def apply_solution(self, list_of_actions : list[Action]) -> None:
         if list_of_actions is None:
             print("No path found.")
             return
@@ -129,7 +132,7 @@ class NonDeterministicSearchProblem(SearchProblem):
           action: Action to be executed
         """
 
-    def apply_solution(self, plan : tuple[object, object]): # plan = (action, plans)        plans = {state : [action, plans]}
+    def apply_solution(self, plan : tuple[Action, Plan]): # plan = (action, plans)        plans = {state : [action, plans]}
         actions_taken = []
         if plan is None:
             print("No path found.")
@@ -174,10 +177,10 @@ class SensorlessSearchProblem(SearchProblem):
                 return False
         return True
 
-    def get_actions(self, belief_state : BeliefState) -> list[object]:
+    def get_actions(self, belief_state : BeliefState) -> list[Action]:
         return list(set().union(*[self.physical_problem.get_actions(state) for state in belief_state.states]))
 
-    def get_transition(self, belief_state : BeliefState, action : object) -> tuple[BeliefState, float]:
+    def get_transition(self, belief_state : BeliefState, action : Action) -> tuple[BeliefState, float]:
         new_states = set()
         pessimistic_cost = 0
         for state in belief_state.states:
@@ -203,7 +206,7 @@ class SensorlessSearchProblem_v2(SensorlessSearchProblem):
         belief_state.was_goal_state = {state : self.physical_problem.is_goal_state(state) for state in belief_state.states}
         return belief_state
     
-    def get_transition(self, belief_state : BeliefState, action : object) -> tuple[BeliefState, float]:
+    def get_transition(self, belief_state : BeliefState, action : Action) -> tuple[BeliefState, float]:
         new_states = set() 
         new_was_goal_state = dict()
         pessimistic_cost = 0
@@ -235,7 +238,7 @@ class PartiallyObservableSearchProblem(NonDeterministicSearchProblem):  #WIP
         self.physical_problem = physical_problem
         super().__init__()
         
-    def predict(self, belief_state : BeliefState, action : object) -> BeliefState:
+    def predict(self, belief_state : BeliefState, action : Action) -> BeliefState:
         """Return the belief state the agent is in after taking an action."""
         if isinstance(self.physical_problem, NonDeterministicSearchProblem):
             states = set().union(*[self.physical_problem.get_transitions(state, action) for state in belief_state.states])
