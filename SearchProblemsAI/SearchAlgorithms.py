@@ -13,7 +13,7 @@ from random import random
 import heapq
 
 from SearchProblemsAI.SearchProblem import Action, Plan, Node, OrderedNode, State, SearchProblem, NonDeterministicSearchProblem
-
+from utils import *
 
 class SearchAlgorithm(ABC):
     """The mother class for every SEARCH algorithm. The method solve() is the minimal representation of how a SEARCH algorithm works.
@@ -171,23 +171,36 @@ class DepthLimitedDFS(SearchAlgorithm):
             child_node = OrderedNode(state = child_state, parent = node, action = action, cost = node.cost + 1)
             self.frontier.append(child_node)
             self.explored[child_state] = child_node
-            
+               
             
 class IDDFS():
     """Iterative Deepening Depth First Search algorithm.
     Complete, optimal if transitions cost are constant, space complexity: O(bm), time complexity: O(b^m)"""
     def __init__(self):
+        self.n_node_explored = 0
         super().__init__()
-    
+        
+    class DLS_for_IDDFS(DepthLimitedDFS):
+        """DLS with the exploring method deal_with_child_state modified to count the number of nodes explored."""
+        @counted
+        def deal_with_child_state(self, child_state, node, action, cost):
+            super().deal_with_child_state(child_state, node, action, cost)
+                    
     def solve(self, problem : SearchProblem):
-        depth = 1
+        n_node_explored_last_DLS = None
+        depth = 0
         while True:
-            algo = DepthLimitedDFS(depth)
+            algo = IDDFS.DLS_for_IDDFS(depth)
             list_of_actions = algo.solve(problem, verbose=0)
             if list_of_actions != None:
                 return list_of_actions
             else:
-                depth += 1
+                depth += 1   
+            n_node_explored = algo.deal_with_child_state.calls
+            if n_node_explored == n_node_explored_last_DLS:
+                return
+            n_node_explored_last_DLS = n_node_explored  
+            
             
             
 class UCS(SearchAlgorithm):
