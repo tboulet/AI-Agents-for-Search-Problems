@@ -12,7 +12,7 @@ from typing import Callable, Union
 from random import random
 import heapq
 
-from SearchProblemsAI.SearchProblem import Node, OrderedNode, State, SearchProblem, NonDeterministicSearchProblem
+from SearchProblemsAI.SearchProblem import Action, Plan, Node, OrderedNode, State, SearchProblem, NonDeterministicSearchProblem
 
 
 class SearchAlgorithm(ABC):
@@ -145,6 +145,51 @@ class BFS(SearchAlgorithm):
             self.explored[child_state] = child_node
 
 
+class DepthLimitedDFS(SearchAlgorithm):
+    """Depth First Search algorithm with a limited depth. This implementation consider nodes as ordered wrt their depth,
+    so the cost attribute is here define as the depth of the node in the search.
+    Not complete, suboptimal, space complexity: O(min(bm, b*depth_limit)), time complexity: O(b^min(M, depth_limit))"""
+    def __init__(self, depth_limit : int):
+        self.depth_limit = depth_limit
+        super().__init__()
+    
+    def init_solver(self, problem):
+        initial_node = OrderedNode(problem.get_start_state(), None, None, cost = 0)
+        self.frontier = [initial_node]
+        self.explored = {initial_node.state : initial_node} 
+    
+    def should_keep_searching(self):
+        return len(self.frontier) > 0
+
+    def extract_best_node_to_explore(self):
+        return self.frontier.pop()
+        
+    def deal_with_child_state(self, child_state : State, node : OrderedNode, action : Action, cost : float):
+        if node.cost >= self.depth_limit:   #If the node is too deep, we don't explore it
+            return
+        if not child_state in self.explored:
+            child_node = OrderedNode(state = child_state, parent = node, action = action, cost = node.cost + 1)
+            self.frontier.append(child_node)
+            self.explored[child_state] = child_node
+            
+            
+class IDDFS():
+    """Iterative Deepening Depth First Search algorithm.
+    Complete, optimal if transitions cost are constant, space complexity: O(bm), time complexity: O(b^m)"""
+    def __init__(self):
+        super().__init__()
+    
+    def solve(self, problem : SearchProblem):
+        depth = 1
+        while True:
+            algo = DepthLimitedDFS(depth)
+            list_of_actions = algo.solve(problem)
+            if list_of_actions != None:
+                return list_of_actions
+            else:
+                depth += 1
+            
+            
 class UCS(SearchAlgorithm):
     """Uniform Cost Search algorithm.
     Complete, optimal, space complexity: O(b^m), time complexity: O(b^m)"""
