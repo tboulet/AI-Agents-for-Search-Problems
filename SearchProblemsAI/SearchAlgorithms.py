@@ -20,7 +20,7 @@ class SearchAlgorithm(ABC):
     Every SEARCH algorithm can be built from this class by implementing methods called in solve().
     """
     
-    def solve(self, problem : SearchProblem)  -> Union[list[object], None]:
+    def solve(self, problem : SearchProblem, verbose : int)  -> Union[list[object], None]:
         """Solve the problem using a search algorithm.
         Return a list of actions that lead to the goal state starting from the start state.
         """
@@ -35,7 +35,7 @@ class SearchAlgorithm(ABC):
                     child_state, cost = problem.get_transition(node.state, action)
                     self.deal_with_child_state(child_state, node, action, cost)
 
-        print("No path found")
+        if verbose >= 1: print("No path found")
         return None
     
     @abstractmethod
@@ -183,7 +183,7 @@ class IDDFS():
         depth = 1
         while True:
             algo = DepthLimitedDFS(depth)
-            list_of_actions = algo.solve(problem)
+            list_of_actions = algo.solve(problem, verbose=0)
             if list_of_actions != None:
                 return list_of_actions
             else:
