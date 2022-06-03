@@ -13,14 +13,14 @@ from random import random
 import heapq
 
 from SearchProblemsAI.SearchProblem import Action, Plan, Node, OrderedNode, State, SearchProblem, NonDeterministicSearchProblem
-from utils import *
+from SearchProblemsAI.utils import *
 
 class SearchAlgorithm(ABC):
     """The mother class for every SEARCH algorithm. The method solve() is the minimal representation of how a SEARCH algorithm works.
     Every SEARCH algorithm can be built from this class by implementing methods called in solve().
     """
     
-    def solve(self, problem : SearchProblem, verbose : int)  -> Union[list[object], None]:
+    def solve(self, problem : SearchProblem, verbose : int = 1)  -> Union[list[object], None]:
         """Solve the problem using a search algorithm.
         Return a list of actions that lead to the goal state starting from the start state.
         """
@@ -190,16 +190,19 @@ class IDDFS():
         n_node_explored_last_DLS = None
         depth = 0
         while True:
+            #Perform depth limited DFS for this depth
             algo = IDDFS.DLS_for_IDDFS(depth)
             list_of_actions = algo.solve(problem, verbose=0)
             if list_of_actions != None:
                 return list_of_actions
             else:
-                depth += 1   
-            n_node_explored = algo.deal_with_child_state.calls
+                depth += 1  
+                 
+            #If the DLS has explored the same number of nodes as the last DLS, we have reached the limit depth = M (max depth of the problem) without finding a solution : no solution
+            n_node_explored = len(algo.explored)
             if n_node_explored == n_node_explored_last_DLS:
                 return
-            n_node_explored_last_DLS = n_node_explored  
+            n_node_explored_last_DLS = n_node_explored 
             
             
             
