@@ -19,7 +19,7 @@ An example of how to use those algorithms once you have defined your SearchProbl
 
 ```python
 from SearchProblemsAI.search_problems.FindCandy import FindCandyProblem
-from SearchProblemsAI.SearchAlgorithms import DFS, BFS, UCS, A_star
+from SearchProblemsAI.SearchAlgorithms import DFS, BFS, IDDFS, UCS, A_star
 from SearchProblemsAI.utils import manhattan_distance
 
 #Define problem
@@ -43,6 +43,9 @@ The search problems have to be deterministic : one action in one state always le
 
 
 ## Define your search problem
+
+The main interest of this package is to be able to quicly define your search problem and then use already implemented algorithms on it. Here is how to define your search problems.
+
 ```python
 from SearchProblemsAI.SearchProblem import State, SearchProblem
 
@@ -60,21 +63,24 @@ You need to first define your state class that must inherit the State class. A s
       
 Then you must define your search problem class. Every search problem class must inherit the class SearchProblem and implements the following methods :
 
-    get_start_state()                                  : return the initial state
-    is_goal_state(state : State)                       : return whether the state is a goal state
-    get_actions(state : State)                         : return the list of actions available in a given state
-    get_transition(state : State, action : object)     : return a tuple (next_state, cost_of_action) that represents the transition
+    get_start_state() -> State                                                : return the initial state
+    is_goal_state(state : State) -> bool                                      : return whether the state is a goal state
+    get_actions(state : State) -> List[Action]                                : return the list of actions available in a given state
+    get_transition(state : State, action : object) -> Tuple[State, float]     : return a tuple (next_state, cost_of_action) that represents the transition
       
-A path finding problem can be found in search_problem/FindCandy.py as an example.
+A path finding problem can be found in ./search_problem/FindCandy.py as an example.
       
 
 ## Define your search algorithm
 Some algorithms are already implemented.
 ```python
-from SearchAlgorithms import DFS, BFS, UCS, A_star
+from SearchAlgorithms import DFS, BFS, IDDFS, UCS, A_star
 ```
 
-But you can also define other search algorithms by inheriting the SearchAlgorithm class and implements the abstract required methods. This implementation is divided into several small methods such as should_keep_searching() or deal_with_child_state(state).
+But you can also define other search algorithms by inheriting the SearchAlgorithm class and implements the abstract required method : solve. Example can be found in ./searchAlgorithms.py
+
+    solve(problem : SearchProblem) -> Union[List[object], None]               : return the sequence of actions leading to a goal state, or None if no solution found.
+
 
 
 ## Solve your search problem
@@ -84,3 +90,12 @@ problem = YourSearchProblem(*args)
 list_of_actions = DFS().solve(problem)
 problem.apply_solution(list_of_actions)
 ````
+
+## Improvements and limitations
+Many other search algorithms are yet to be implemented.
+
+A wrapper transforming a searchProblem object in a sensorless problem that can be interpreted as a more complex search problem is implemented but I'm not sure it is working. A sensorless problem is a search problem where you don't know the state you are in, and you need a sequence of action that always lead to a goal state no matter where you start. 
+
+This package is limited to deterministic search problem, ie a given action in a given state always lead to the same next state. Algorithms for non deterministic search problems exist, returning a plan (a policy giving what to do in any state) rather than a sequence of actions, but are not yet implemented successfully.
+
+A benchmark of all the algorithms existing and their performance in time and space complexity with regards to different problem parameters such as branching factor or solution's depth could be interesting.
