@@ -14,7 +14,7 @@ setup(
     install_requires=requirements[1:],
     dependency_links=requirements[:1],
         # package_data={"configs": "*.yaml"},
-    version="0.0.1",
+    version="1.0.1",
     license="MIT",
     description="SearchProblemsAI is a library of AI agents for Search Problems.",
     long_description=open('README.md').read(),

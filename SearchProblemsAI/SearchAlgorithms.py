@@ -20,6 +20,7 @@ class SearchAlgorithm(ABC):
     Every SEARCH algorithm can be built from this class by implementing methods called in solve().
     """
     
+    @abstractmethod
     def solve(self, problem : SearchProblem, verbose : int = 1)  -> Union[list[object], None]:
         """Solve the problem using a search algorithm.
         Return a list of actions that lead to the goal state starting from the start state.
@@ -37,34 +38,7 @@ class SearchAlgorithm(ABC):
 
         if verbose >= 1: print("No path found")
         return None
-    
-    @abstractmethod
-    def init_solver(self, problem : SearchProblem) -> None:
-        """
-        Initializes objects such as stacks, queues, sets at the beginning of a solving operation.
-        """
         
-    @abstractmethod
-    def should_keep_searching(self) -> bool:
-        """
-        Return whether the algorithm should keep searching.
-        """
-    
-    @abstractmethod
-    def extract_best_node_to_explore(self) -> Node:
-        """
-        Return the next node to explore from the frontier and remove it from the frontier.
-        """
-    
-    @abstractmethod
-    def deal_with_child_state(self, child_state : State, node : Node, action : object, cost : float) -> None:
-        """Given a possibly new child state found, add the corresponding node (or not) to the frontier.
-        child_state : a state
-        node : the parent of child_state
-        action : the action taken to reach this child_state 
-        cost : the cost of the action taken to reach this child_state 
-        """
-    
     #Permanent methods
     def reconstruct_path(self, node : Node) -> list[object]:
         """Given a node, return a list of actions that lead to the node.
@@ -82,19 +56,27 @@ class DFS_treeSearch(SearchAlgorithm):
     def __init__(self):
         super().__init__()
     
-    def init_solver(self, problem):
+    def solve(self, problem : SearchProblem, verbose : int = 1) -> Union[list[object], None]:
+        """Solve the problem using a search algorithm.
+        Return a list of actions that lead to the goal state starting from the start state.
+        """
+        
         initial_node = Node(problem.get_start_state(), None, None)
         self.frontier = [initial_node]
-    
-    def should_keep_searching(self):
-        return len(self.frontier) > 0
 
-    def extract_best_node_to_explore(self):
-        return self.frontier.pop()
-        
-    def deal_with_child_state(self, child_state, node, action, cost):
-        child_node = Node(state = child_state, parent = node, action = action)
-        self.frontier.append(child_node)
+        while len(self.frontier) > 0:
+            node = self.frontier.pop()
+            if problem.is_goal_state(node.state):
+                return self.reconstruct_path(node)
+            else:
+                actions = problem.get_actions(node.state)
+                for action in actions:
+                    child_state, cost = problem.get_transition(node.state, action)
+                    child_node = Node(state = child_state, parent = node, action = action)
+                    self.frontier.append(child_node)        
+    
+        if verbose >= 1: print("No path found")
+        return None
         
 
 class DFS(SearchAlgorithm):
@@ -102,23 +84,30 @@ class DFS(SearchAlgorithm):
     Complete, suboptimal, space complexity: O(bm), time complexity: O(b^M)"""
     def __init__(self):
         super().__init__()
-    
-    def init_solver(self, problem):
+
+    def solve(self, problem : SearchProblem, verbose : int = 1)  -> Union[list[object], None]:
+        """Solve the problem using a search algorithm.
+        Return a list of actions that lead to the goal state starting from the start state.
+        """
         initial_node = Node(problem.get_start_state(), None, None)
         self.frontier = [initial_node]
         self.explored = {initial_node.state : initial_node} 
-    
-    def should_keep_searching(self):
-        return len(self.frontier) > 0
+        while len(self.frontier) > 0:
+            node = self.frontier.pop()
+            if problem.is_goal_state(node.state):
+                return self.reconstruct_path(node)
+            else:
+                actions = problem.get_actions(node.state)
+                for action in actions:
+                    child_state, cost = problem.get_transition(node.state, action)
+                    if not child_state in self.explored:
+                        child_node = Node(state = child_state, parent = node, action = action)
+                        self.frontier.append(child_node)
+                        self.explored[child_state] = child_node
 
-    def extract_best_node_to_explore(self):
-        return self.frontier.pop()
-        
-    def deal_with_child_state(self, child_state, node, action, cost):
-        if not child_state in self.explored:
-            child_node = Node(state = child_state, parent = node, action = action)
-            self.frontier.append(child_node)
-            self.explored[child_state] = child_node
+        if verbose >= 1: print("No path found")
+        return None
+    
 
 
 class BFS(SearchAlgorithm):
@@ -126,24 +115,30 @@ class BFS(SearchAlgorithm):
     Complete, suboptimal, space complexity: O(b^m), time complexity: O(b^m)"""
     def __init__(self):
         super().__init__()
-    
-    def init_solver(self, problem):
+
+    def solve(self, problem : SearchProblem, verbose : int = 1)  -> Union[list[object], None]:
+        """Solve the problem using a search algorithm.
+        Return a list of actions that lead to the goal state starting from the start state.
+        """
         initial_node = Node(problem.get_start_state(), None, None)
         self.frontier = [initial_node]
         self.explored = {initial_node.state : initial_node} 
+        while len(self.frontier) > 0:
+            node = self.frontier.pop(0)
+            if problem.is_goal_state(node.state):
+                return self.reconstruct_path(node)
+            else:
+                actions = problem.get_actions(node.state)
+                for action in actions:
+                    child_state, cost = problem.get_transition(node.state, action)
+                    if not child_state in self.explored:
+                        child_node = Node(state = child_state, parent = node, action = action)
+                        self.frontier.append(child_node)
+                        self.explored[child_state] = child_node
+
+        if verbose >= 1: print("No path found")
+        return None
     
-    def should_keep_searching(self):
-        return len(self.frontier) > 0
-
-    def extract_best_node_to_explore(self):
-        return self.frontier.pop(0)
-        
-    def deal_with_child_state(self, child_state, node, action, cost):
-        if not child_state in self.explored:
-            child_node = Node(state = child_state, parent = node, action = action)
-            self.frontier.append(child_node)
-            self.explored[child_state] = child_node
-
 
 class DepthLimitedDFS(SearchAlgorithm):
     """Depth First Search algorithm with a limited depth. This implementation consider nodes as ordered wrt their depth,
@@ -152,25 +147,33 @@ class DepthLimitedDFS(SearchAlgorithm):
     def __init__(self, depth_limit : int):
         self.depth_limit = depth_limit
         super().__init__()
-    
-    def init_solver(self, problem):
+
+    def solve(self, problem : SearchProblem, verbose : int = 1)  -> Union[list[object], None]:
+        """Solve the problem using a search algorithm.
+        Return a list of actions that lead to the goal state starting from the start state.
+        """
         initial_node = OrderedNode(problem.get_start_state(), None, None, cost = 0)
         self.frontier = [initial_node]
         self.explored = {initial_node.state : initial_node} 
-    
-    def should_keep_searching(self):
-        return len(self.frontier) > 0
+        while len(self.frontier) > 0:
+            node = self.frontier.pop()
+            if problem.is_goal_state(node.state):
+                return self.reconstruct_path(node)
+            else:
+                actions = problem.get_actions(node.state)
+                for action in actions:
+                    child_state, cost = problem.get_transition(node.state, action)
+                    if node.cost >= self.depth_limit:   #If the node is too deep, we don't explore it
+                        return
+                    if not child_state in self.explored:
+                        child_node = OrderedNode(state = child_state, parent = node, action = action, cost = node.cost + 1)
+                        self.frontier.append(child_node)
+                        self.explored[child_state] = child_node
 
-    def extract_best_node_to_explore(self):
-        return self.frontier.pop()
+        if verbose >= 1: print("No path found")
+        return None
+    
         
-    def deal_with_child_state(self, child_state : State, node : OrderedNode, action : Action, cost : float):
-        if node.cost >= self.depth_limit:   #If the node is too deep, we don't explore it
-            return
-        if not child_state in self.explored:
-            child_node = OrderedNode(state = child_state, parent = node, action = action, cost = node.cost + 1)
-            self.frontier.append(child_node)
-            self.explored[child_state] = child_node
                
             
 class IDDFS():
@@ -179,19 +182,13 @@ class IDDFS():
     def __init__(self):
         self.n_node_explored = 0
         super().__init__()
-        
-    class DLS_for_IDDFS(DepthLimitedDFS):
-        """DLS with the exploring method deal_with_child_state modified to count the number of nodes explored."""
-        @counted
-        def deal_with_child_state(self, child_state, node, action, cost):
-            super().deal_with_child_state(child_state, node, action, cost)
-                    
+                            
     def solve(self, problem : SearchProblem):
         n_node_explored_last_DLS = None
         depth = 0
         while True:
             #Perform depth limited DFS for this depth
-            algo = IDDFS.DLS_for_IDDFS(depth)
+            algo = DepthLimitedDFS(depth)
             list_of_actions = algo.solve(problem, verbose=0)
             if list_of_actions != None:
                 return list_of_actions
@@ -211,24 +208,31 @@ class UCS(SearchAlgorithm):
     Complete, optimal, space complexity: O(b^m), time complexity: O(b^m)"""
     def __init__(self):
         super().__init__()
-        
-    def init_solver(self, problem):
+    
+    def solve(self, problem : SearchProblem, verbose : int = 1)  -> Union[list[object], None]:
+        """Solve the problem using a search algorithm.
+        Return a list of actions that lead to the goal state starting from the start state.
+        """
         initial_node = OrderedNode(problem.get_start_state(), None, None, 0)
         self.frontier = [initial_node]
         self.explored = {initial_node.state : initial_node}
-        
-    def should_keep_searching(self):
-        return len(self.frontier) > 0
-    
-    def extract_best_node_to_explore(self):
-        return heapq.heappop(self.frontier)
-    
-    def deal_with_child_state(self, child_state: State, node: OrderedNode, action: object, cost: float):        
-        if (not child_state in self.explored) or (self.explored[child_state].cost > self.explored[node.state].cost + cost):
-            new_cost = self.explored[node.state].cost + cost
-            child_node = OrderedNode(state = child_state, parent = node, action = action, cost = new_cost)
-            heapq.heappush(self.frontier, child_node)
-            self.explored[child_state] = child_node
+        while len(self.frontier) > 0:
+            node = heapq.heappop(self.frontier)
+            if problem.is_goal_state(node.state):
+                return self.reconstruct_path(node)
+            else:
+                actions = problem.get_actions(node.state)
+                for action in actions:
+                    child_state, cost = problem.get_transition(node.state, action)
+                    if (not child_state in self.explored) or (self.explored[child_state].cost > self.explored[node.state].cost + cost):
+                        new_cost = self.explored[node.state].cost + cost
+                        child_node = OrderedNode(state = child_state, parent = node, action = action, cost = new_cost)
+                        heapq.heappush(self.frontier, child_node)
+                        self.explored[child_state] = child_node
+
+        if verbose >= 1: print("No path found")
+        return None
+                    
         
 
 class A_star(SearchAlgorithm):
@@ -237,32 +241,40 @@ class A_star(SearchAlgorithm):
     def __init__(self, heuristic : Callable[[State], float] = lambda state : 0) -> None:
         super().__init__()
         self.heuristic = heuristic
-        
-    def init_solver(self, problem : SearchProblem) -> None:
+
+    def solve(self, problem : SearchProblem, verbose : int = 1)  -> Union[list[object], None]:
+        """Solve the problem using a search algorithm.
+        Return a list of actions that lead to the goal state starting from the start state.
+        """
         initial_state = problem.get_start_state()
         initial_node = OrderedNode(initial_state, None, None, self.heuristic(initial_state))
         self.frontier = [initial_node]
         self.explored = {initial_node.state : initial_node}
+        while len(self.frontier) > 0:
+            node = heapq.heappop(self.frontier)
+            if problem.is_goal_state(node.state):
+                return self.reconstruct_path(node)
+            else:
+                actions = problem.get_actions(node.state)
+                for action in actions:
+                    child_state, cost = problem.get_transition(node.state, action)
+                    if child_state in self.explored:
+                        new_cost = self.explored[node.state].cost + cost + self.heuristic(child_state)
+                        if self.explored[child_state].cost > new_cost:
+                            child_node = OrderedNode(state = child_state, parent = node, action = action, cost = new_cost)
+                            heapq.heappush(self.frontier, child_node)
+                            self.explored[child_state] = child_node
+                        
+                    else:
+                        new_cost = self.explored[node.state].cost + cost + self.heuristic(child_state)
+                        child_node = OrderedNode(state = child_state, parent = node, action = action, cost = new_cost)
+                        heapq.heappush(self.frontier, child_node)
+                        self.explored[child_state] = child_node
+
+        if verbose >= 1: print("No path found")
+        return None
         
-    def should_keep_searching(self) -> bool:
-        return len(self.frontier) > 0
-    
-    def extract_best_node_to_explore(self) -> OrderedNode:
-        return heapq.heappop(self.frontier)
-    
-    def deal_with_child_state(self, child_state: State, node: OrderedNode, action: object, cost: float) -> None:    
-        if child_state in self.explored:
-            new_cost = self.explored[node.state].cost + cost + self.heuristic(child_state)
-            if self.explored[child_state].cost > new_cost:
-                child_node = OrderedNode(state = child_state, parent = node, action = action, cost = new_cost)
-                heapq.heappush(self.frontier, child_node)
-                self.explored[child_state] = child_node
-            
-        else:
-            new_cost = self.explored[node.state].cost + cost + self.heuristic(child_state)
-            child_node = OrderedNode(state = child_state, parent = node, action = action, cost = new_cost)
-            heapq.heappush(self.frontier, child_node)
-            self.explored[child_state] = child_node
+        
             
             
 
