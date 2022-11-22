@@ -12,7 +12,7 @@ The main feature is to define relatively quickly your concrete search problem as
 ## Installation :
 Run this command to install the package SearchProblemAI:
 
-    pip install git+https://github.com/tboulet/AI-Agents-for-Search-Problems
+    pip install SearchProblemsAI
 
 ## Using the package 
 An example of how to use those algorithms once you have defined your SearchProblem can be found in example.py or here :
