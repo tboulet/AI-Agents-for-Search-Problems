@@ -2,7 +2,7 @@
 A search problem is defined as a graph of node (states) and weighted edges (action leading from one state to another and costing a cost) where the goal is to find a certain goal state while minimizing the cost if possible. A good example is the pathfinding problem where your agent want to find the shortest path to a certain location. 
 These problems can be partially solved using easy to implement graph algorithms adapted to the model-free nature of those problems (we don't know every states but rather discover them during the exploration of the state space).
 
-![Alt text](search_pb.png)
+![Alt text](assets/search_pb.png)
 
 ## Package SearchProblemsAI
 An implementation in python of some algorithms for search problems such as A*, that can be applied to any problem object that follow the SearchProblem interface.
